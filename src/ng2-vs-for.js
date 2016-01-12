@@ -1,4 +1,4 @@
-System.register(['angular2/core'], function(exports_1) {
+System.register(['angular2/core', 'angular2/src/facade/async'], function(exports_1) {
     var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
         var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
         if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -8,7 +8,7 @@ System.register(['angular2/core'], function(exports_1) {
     var __metadata = (this && this.__metadata) || function (k, v) {
         if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
     };
-    var core_1;
+    var core_1, async_1;
     var dde, matchingFunction, VsFor;
     function closestElement(el, selector) {
         while (el !== document.documentElement && el != null && !el[matchingFunction](selector)) {
@@ -60,6 +60,9 @@ System.register(['angular2/core'], function(exports_1) {
         setters:[
             function (core_1_1) {
                 core_1 = core_1_1;
+            },
+            function (async_1_1) {
+                async_1 = async_1_1;
             }],
         execute: function() {
             dde = document.documentElement, matchingFunction = dde.matches ? 'matches' :
@@ -72,17 +75,21 @@ System.register(['angular2/core'], function(exports_1) {
                                         dde.mozMatchesSelector ? 'mozMatchesSelector' : null;
             ;
             VsFor = (function () {
-                function VsFor(_element, _viewContainer, _templateRef, _renderer) {
+                function VsFor(_element, _viewContainer, _templateRef, _renderer, _ngZone) {
                     this._element = _element;
                     this._viewContainer = _viewContainer;
                     this._templateRef = _templateRef;
                     this._renderer = _renderer;
+                    this._ngZone = _ngZone;
                     this._originalCollection = [];
                     this._slicedCollection = [];
-                    this.initPlaceholdersDone = false;
                     this.view = this._viewContainer.createEmbeddedView(this._templateRef);
                     this.parent = this._element.nativeElement.nextElementSibling;
-                    // console.log(this.tagName);
+                    var tagName = 'div';
+                    if (this.parent.attributes['vs-tag']) {
+                        tagName = this.parent.attributes['vs-tag'].value;
+                    }
+                    this.initPlaceholders(tagName);
                 }
                 Object.defineProperty(VsFor.prototype, "originalCollection", {
                     get: function () {
@@ -102,15 +109,13 @@ System.register(['angular2/core'], function(exports_1) {
                         return this._slicedCollection;
                     },
                     set: function (value) {
-                        console.warn('***');
                         this._slicedCollection = value;
                         this.view.setLocal('vsCollection', this._slicedCollection);
                     },
                     enumerable: true,
                     configurable: true
                 });
-                VsFor.prototype.initPlaceholders = function () {
-                    var tagName = this.parent.children[0].tagName.toLowerCase();
+                VsFor.prototype.initPlaceholders = function (tagName) {
                     this.before = document.createElement(tagName);
                     this.before.className = 'vsFor-before';
                     this.after = document.createElement(tagName);
@@ -124,16 +129,6 @@ System.register(['angular2/core'], function(exports_1) {
                     else {
                         this.before.style.width = '100%';
                         this.after.style.width = '100%';
-                    }
-                    this.initPlaceholdersDone = true;
-                    this.setAutoSize();
-                };
-                VsFor.prototype.ngAfterContentChecked = function () {
-                    var _this = this;
-                    if (this.originalCollection.length && !this.initPlaceholdersDone) {
-                        setTimeout(function () {
-                            _this.initPlaceholders();
-                        });
                     }
                 };
                 VsFor.prototype.ngOnInit = function () {
@@ -151,6 +146,7 @@ System.register(['angular2/core'], function(exports_1) {
                     else {
                         this.scrollParent = this.parent;
                     }
+                    this.elementSize = getClientSize(this.scrollParent, this.clientSize) || 50;
                     this.offsetBefore = 0;
                     this.offsetAfter = 0;
                     this.excess = 2;
@@ -234,6 +230,7 @@ System.register(['angular2/core'], function(exports_1) {
                     // });
                 };
                 VsFor.prototype.refresh = function () {
+                    var _this = this;
                     if (!this.originalCollection || this.originalCollection.length < 1) {
                         this.slicedCollection = [];
                         this.originalLength = 0;
@@ -264,6 +261,10 @@ System.register(['angular2/core'], function(exports_1) {
                             this.sizesCumulative.push(sum);
                         }
                         else {
+                            var unsub = async_1.ObservableWrapper.subscribe(this._ngZone.onEventDone, function () {
+                                _this.setAutoSize();
+                                unsub();
+                            });
                         }
                     }
                     this.reinitialize();
@@ -276,34 +277,27 @@ System.register(['angular2/core'], function(exports_1) {
                     this._prevEndIndex = void 0;
                     this._minStartIndex = this.originalLength;
                     this._maxEndIndex = 0;
-                    if (this.initPlaceholdersDone) {
-                        this.updateInnerCollection();
-                    }
-                    else {
-                        this.slicedCollection = this.originalCollection.slice(0, 1);
-                    }
+                    this.updateInnerCollection();
                     this.updateTotalSize(this.__sizesPropertyExists ?
                         this.sizesCumulative[this.originalLength] :
                         this.elementSize * this.originalLength);
                 };
                 VsFor.prototype.setAutoSize = function () {
+                    var _this = this;
                     if (this.__autoSize) {
                         if (this.parent.offsetHeight || this.parent.offsetWidth) {
                             var child = this.parent.children[1];
                             var gotSomething = false;
-                            // while (i < children.length) {
-                            // if (children[i].attributes[originalNgRepeatAttr] != null) {
-                            gotSomething = true;
                             if (child[this.offsetSize]) {
+                                gotSomething = true;
                                 this.elementSize = child[this.offsetSize];
-                                console.warn('autosized shit', this.elementSize);
+                                console.warn('autosized', this.elementSize);
                             }
-                            // }
-                            //     i++;
-                            // }
                             if (gotSomething) {
-                                this.reinitialize();
                                 this.__autoSize = false;
+                                this._ngZone.run(function () {
+                                    _this.reinitialize();
+                                });
                             }
                         }
                     }
@@ -362,7 +356,7 @@ System.register(['angular2/core'], function(exports_1) {
                                 this.endIndex !== this._prevEndIndex;
                         }
                     }
-                    console.warn(this.startIndex, this.endIndex);
+                    // console.warn(this.startIndex, this.endIndex);
                     if (digestRequired) {
                         this.slicedCollection = this.originalCollection.slice(this.startIndex, this.endIndex);
                         // Emit the event
@@ -391,7 +385,7 @@ System.register(['angular2/core'], function(exports_1) {
                             'originalCollection: vsFor'
                         ]
                     }), 
-                    __metadata('design:paramtypes', [core_1.ElementRef, core_1.ViewContainerRef, core_1.TemplateRef, core_1.Renderer])
+                    __metadata('design:paramtypes', [core_1.ElementRef, core_1.ViewContainerRef, core_1.TemplateRef, core_1.Renderer, core_1.NgZone])
                 ], VsFor);
                 return VsFor;
             })();

@@ -4,8 +4,11 @@ import {
     TemplateRef,
     ElementRef,
     Renderer,
-    ViewRef
+    ViewRef,
+    NgZone,
 } from 'angular2/core';
+
+import {ObservableWrapper} from 'angular2/src/facade/async';
 
 const dde:any = document.documentElement,
     matchingFunction = dde.matches ? 'matches' :
@@ -86,7 +89,6 @@ export class VsFor {
     view: ViewRef;
     parent: HTMLElement;
     tagName: string;
-    initPlaceholdersDone = false;
     __horizontal: boolean;
     __autoSize: boolean;
     __sizesPropertyExists: boolean;
@@ -119,7 +121,6 @@ export class VsFor {
         return this._originalCollection;
     }
     set slicedCollection(value: any[]) {
-        console.warn('***');
         this._slicedCollection = value;
         this.view.setLocal('vsCollection', this._slicedCollection);
     }
@@ -130,14 +131,19 @@ export class VsFor {
         private _element: ElementRef,
         private _viewContainer: ViewContainerRef,
         private _templateRef: TemplateRef,
-        private _renderer: Renderer
+        private _renderer: Renderer,
+        private _ngZone: NgZone
     ) {
         this.view = this._viewContainer.createEmbeddedView(this._templateRef);
         this.parent = this._element.nativeElement.nextElementSibling;
-        // console.log(this.tagName);
+
+        let tagName = 'div';
+        if (this.parent.attributes['vs-tag']) {
+            tagName = this.parent.attributes['vs-tag'].value;
+        }
+        this.initPlaceholders(tagName);
     }
-    initPlaceholders() {
-        const tagName = this.parent.children[0].tagName.toLowerCase();
+    initPlaceholders(tagName: string) {
         this.before = document.createElement(tagName);
         this.before.className = 'vsFor-before';
         this.after = document.createElement(tagName);
@@ -152,16 +158,6 @@ export class VsFor {
         else {
             this.before.style.width = '100%';
             this.after.style.width = '100%';
-        }
-
-        this.initPlaceholdersDone = true;
-        this.setAutoSize();
-    }
-    ngAfterContentChecked() {
-        if (this.originalCollection.length && !this.initPlaceholdersDone) {
-            setTimeout(() => { // TODO: improve?
-                this.initPlaceholders();
-            });
         }
     }
     ngOnInit() {
@@ -180,6 +176,7 @@ export class VsFor {
             this.scrollParent = this.parent;
         }
 
+        this.elementSize = getClientSize(this.scrollParent, this.clientSize) || 50;
         this.offsetBefore = 0;
         this.offsetAfter = 0;
         this.excess = 2;
@@ -307,7 +304,10 @@ export class VsFor {
                 this.sizesCumulative.push(sum);
             }
             else {
-                // this.setAutoSize();
+                let unsub:any = ObservableWrapper.subscribe(this._ngZone.onEventDone, () => {
+                    this.setAutoSize();
+                    unsub();
+                });
             }
         }
 
@@ -321,12 +321,8 @@ export class VsFor {
         this._prevEndIndex = void 0;
         this._minStartIndex = this.originalLength;
         this._maxEndIndex = 0;
-        if (this.initPlaceholdersDone) {
-            this.updateInnerCollection();
-        }
-        else {
-            this.slicedCollection = this.originalCollection.slice(0, 1);
-        }
+        this.updateInnerCollection();
+
         this.updateTotalSize(this.__sizesPropertyExists ?
             this.sizesCumulative[this.originalLength] :
             this.elementSize * this.originalLength
@@ -337,22 +333,18 @@ export class VsFor {
             if (this.parent.offsetHeight || this.parent.offsetWidth) { // element is visible
                 const child = this.parent.children[1];
                 let gotSomething = false;
-                // while (i < children.length) {
-                    // if (children[i].attributes[originalNgRepeatAttr] != null) {
 
-                        gotSomething = true;
-                        if (child[this.offsetSize]) {
-                            this.elementSize = child[this.offsetSize];
-                            console.warn('autosized shit', this.elementSize);
-                        }
-
-                    // }
-                //     i++;
-                // }
+                if (child[this.offsetSize]) {
+                    gotSomething = true;
+                    this.elementSize = child[this.offsetSize];
+                    console.warn('autosized', this.elementSize);
+                }
 
                 if (gotSomething) {
-                    this.reinitialize();
                     this.__autoSize = false;
+                    this._ngZone.run(() => {
+                        this.reinitialize();
+                    });
                 }
             }
         }
@@ -441,7 +433,7 @@ export class VsFor {
             }
         }
 
-        console.warn(this.startIndex, this.endIndex);
+        // console.warn(this.startIndex, this.endIndex);
 
         if (digestRequired) {
             this.slicedCollection = this.originalCollection.slice(this.startIndex, this.endIndex);

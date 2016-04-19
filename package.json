@@ -1,6 +1,6 @@
 {
   "name": "ng2-vs-for",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "scripts": {
     "tsc": "tsc",
     "tsc:w": "tsc -w",
@@ -20,7 +20,7 @@
     "url": "https://github.com/kamilkp/ng2-vs-for.git"
   },
   "peerDependencies": {
-    "angular2": "^2.0.0-beta.15"
+    "angular2": "^2.0.0-beta.10"
   },
   "devDependencies": {
     "angular2": "^2.0.0-beta.15",

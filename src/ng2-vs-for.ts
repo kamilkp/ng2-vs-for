@@ -159,7 +159,7 @@ export class VsFor {
       if (ch !== _prevClientSize) {
       	_prevClientSize = ch;
       	this._ngZone.run(() => {
-          this.reinitialize();
+          this.refresh();
       	});
       }
       else {
@@ -463,6 +463,7 @@ export class VsFor {
 
     if (digestRequired) {
       this.slicedCollection = this.originalCollection.slice(this.startIndex, this.endIndex);
+      this.view.setLocal('vsStartIndex', this.startIndex);
 
       // TODO figure out these events
       // Emit the event

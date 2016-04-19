@@ -1,3 +1,4 @@
+"use strict";
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -89,7 +90,7 @@ var VsFor = (function () {
             if (ch !== _prevClientSize) {
                 _prevClientSize = ch;
                 _this._ngZone.run(function () {
-                    _this.reinitialize();
+                    _this.refresh();
                 });
             }
             else {
@@ -260,13 +261,13 @@ var VsFor = (function () {
                     // let size = 10; // TODO
                     // return size;
                 });
-                var sum = 0;
+                var sum_1 = 0;
                 this.sizesCumulative = this.sizes.map(function (size) {
-                    var res = sum;
-                    sum += size;
+                    var res = sum_1;
+                    sum_1 += size;
                     return res;
                 });
-                this.sizesCumulative.push(sum);
+                this.sizesCumulative.push(sum_1);
             }
             else {
                 this.__autoSize = true;
@@ -368,6 +369,7 @@ var VsFor = (function () {
         // console.warn(this.startIndex, this.endIndex);
         if (digestRequired) {
             this.slicedCollection = this.originalCollection.slice(this.startIndex, this.endIndex);
+            this.view.setLocal('vsStartIndex', this.startIndex);
             // TODO figure out these events
             // Emit the event
             // $scope.$emit('vsRepeatInnerCollectionUpdated', this.startIndex, this.endIndex, this._prevStartIndex, this._prevEndIndex);
@@ -396,10 +398,9 @@ var VsFor = (function () {
                 'vsForGetSize'
             ]
         }), 
-        __metadata('design:paramtypes', [(typeof (_a = typeof core_1.ElementRef !== 'undefined' && core_1.ElementRef) === 'function' && _a) || Object, (typeof (_b = typeof core_1.ViewContainerRef !== 'undefined' && core_1.ViewContainerRef) === 'function' && _b) || Object, (typeof (_c = typeof core_1.TemplateRef !== 'undefined' && core_1.TemplateRef) === 'function' && _c) || Object, (typeof (_d = typeof core_1.Renderer !== 'undefined' && core_1.Renderer) === 'function' && _d) || Object, (typeof (_e = typeof core_1.NgZone !== 'undefined' && core_1.NgZone) === 'function' && _e) || Object])
+        __metadata('design:paramtypes', [core_1.ElementRef, core_1.ViewContainerRef, core_1.TemplateRef, core_1.Renderer, core_1.NgZone])
     ], VsFor);
     return VsFor;
-    var _a, _b, _c, _d, _e;
-})();
+}());
 exports.VsFor = VsFor;
 //# sourceMappingURL=ng2-vs-for.js.map

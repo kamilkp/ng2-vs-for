@@ -1,6 +1,6 @@
 {
   "name": "ng2-vs-for",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "scripts": {
     "tsc": "tsc",
     "tsc:w": "tsc -w",

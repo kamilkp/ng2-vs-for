@@ -1,0 +1,43 @@
+<html>
+
+  <head>
+    <title>ng2-vs-for test</title>
+
+    <script src="/node_modules/angular2/bundles/angular2-polyfills.js"></script>
+    <script src="/node_modules/systemjs/dist/system.src.js"></script>
+    <script src="/node_modules/rxjs/bundles/Rx.js"></script>
+    <script src="/node_modules/angular2/bundles/angular2.dev.js"></script>
+
+    <script>
+      System.import('boot.js').then(null, console.error.bind(console));
+    </script>
+
+    <style type="text/css">
+      ::-webkit-scrollbar
+      {
+        width: 12px;  /* for vertical scrollbars */
+        height: 12px; /* for horizontal scrollbars */
+      }
+
+      ::-webkit-scrollbar-track
+      {
+        background: rgba(0, 0, 0, 0.1);
+      }
+
+      ::-webkit-scrollbar-thumb
+      {
+        background: rgba(0, 0, 0, 0.5);
+      }
+    </style>
+
+  </head>
+
+  <body>
+    <ng2-vs-for-test>Loading...</ng2-vs-for-test>
+    <div id="time"></div>
+    <script type="text/javascript">
+      document.getElementById('time').innerHTML = new Date();
+    </script>
+  </body>
+
+</html>

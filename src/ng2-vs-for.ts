@@ -116,6 +116,7 @@ export class VsFor {
 	vsOffsetBefore        : number = 0;
 	vsOffsetAfter         : number = 0;
 	vsExcess              : number = 2;
+	vsForGetSize					: any;
   set originalCollection(value: any[]) {
     this._originalCollection = value || [];
     if (this.scrollParent) {

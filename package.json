@@ -1,6 +1,6 @@
 {
   "name": "ng2-vs-for",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "scripts": {
     "tsc": "tsc",
     "tsc:w": "tsc -w",
@@ -14,15 +14,16 @@
     "email": "kamilkp@gmail.com",
     "url": "http://github.com/kamilkp"
   },
-  "main": "src/ng2-vs-for.js",
+  "main": "src/ng2-vs-for.ts",
   "repository": {
     "type": "git",
     "url": "https://github.com/kamilkp/ng2-vs-for.git"
   },
-  "dependencies": {
+  "peerDependencies": {
     "angular2": "^2.0.0-beta.15"
   },
   "devDependencies": {
+    "angular2": "^2.0.0-beta.15",
     "es6-promise": "^3.0.2",
     "es6-shim": "^0.35.0",
     "reflect-metadata": "0.1.2",

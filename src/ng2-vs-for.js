@@ -396,9 +396,10 @@ var VsFor = (function () {
                 'vsForGetSize'
             ]
         }), 
-        __metadata('design:paramtypes', [core_1.ElementRef, core_1.ViewContainerRef, core_1.TemplateRef, core_1.Renderer, core_1.NgZone])
+        __metadata('design:paramtypes', [(typeof (_a = typeof core_1.ElementRef !== 'undefined' && core_1.ElementRef) === 'function' && _a) || Object, (typeof (_b = typeof core_1.ViewContainerRef !== 'undefined' && core_1.ViewContainerRef) === 'function' && _b) || Object, (typeof (_c = typeof core_1.TemplateRef !== 'undefined' && core_1.TemplateRef) === 'function' && _c) || Object, (typeof (_d = typeof core_1.Renderer !== 'undefined' && core_1.Renderer) === 'function' && _d) || Object, (typeof (_e = typeof core_1.NgZone !== 'undefined' && core_1.NgZone) === 'function' && _e) || Object])
     ], VsFor);
     return VsFor;
+    var _a, _b, _c, _d, _e;
 })();
 exports.VsFor = VsFor;
 //# sourceMappingURL=ng2-vs-for.js.map

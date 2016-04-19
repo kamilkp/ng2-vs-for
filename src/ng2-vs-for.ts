@@ -9,8 +9,6 @@ import {
   NgZone,
 } from 'angular2/core';
 
-import {ObservableWrapper} from 'angular2/src/facade/async';
-
 const dde:any = document.documentElement,
   matchingFunction = dde.matches ? 'matches' :
             dde.matchesSelector ? 'matchesSelector' :

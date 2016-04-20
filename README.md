@@ -7,6 +7,11 @@ ng2-vs-for 1.0.10 [![npm version](https://badge.fury.io/js/ng2-vs-for.svg)](http
 
 The name stands for **Virtual Scroll For**. It manipulates the collection you want to `ngFor` over in a way that only elements that are actually visible for the user are rendered in the DOM. So if you repeat over a thousand items only a few of them are rendered in the DOM, because the user can't see the rest anyway. And it takes time for the browser to render so many elements, which also might have some event listeners/bindings etc. So you should see a considerable boost in performance.
 
+Installation
+===
+
+`npm install ng2-vs-for`
+
 Examples
 ===
 
@@ -23,12 +28,32 @@ all items shall have the same height
 
 Items have varoius sizes but they are known up front (calculatable based on their properties)
 
-```html
-<div *vsFor="items; size:getSize; #_items = vsCollection">
-    <div *ngFor="#item of _items">
-        <!-- item html here -->
-    </div>
-</div>
+```javascript
+import {VsFor} from 'ng2-vs-for';
+import {Component} from 'angular2/core';
+
+@Component({
+    name: 'some-component',
+    directives: [VsFor],
+    template: `
+        <div *vsFor="items; size:getSize; #_items = vsCollection">
+            <div *ngFor="#item of _items">
+                <!-- item html here -->
+            </div>
+        </div>
+
+    `,
+    inputs: ['items']
+})
+
+export class SomeComponent {
+    items: any;
+    getSize(item, index) {
+        let size;
+        // ... do some calculations here
+        return size;
+    }
+}
 ```
 
 The `getSize` could either be a number (or string castable to number) or a function on your component. If it's a function it will be called for each item in the original collection with two arguments: `item` (the item in the collection), and `index` (the index in the original collection). This function shall return a number - the height in pixels of the item.

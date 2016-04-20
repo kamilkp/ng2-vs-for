@@ -31,14 +31,16 @@ Items have varoius sizes but they are known up front (calculatable based on thei
 
 The `getSize` could either be a number (or string castable to number) or a function on your component. If it's a function it will be called for each item in the original collection with two arguments: `item` (the item in the collection), and `index` (the index in the original collection). This function shall return a number - the height in pixels of the item.
 
----
+Local variables
+===
 
 The `vsFor` directive is a structural directive and it exposes two local variables:
 
 - `vsCollection` - the sliced collection that should be assigned to a local variable and be used in `ngFor`
 - `vsStartIndex` - the index of the first element that is actually rendered (see last example at the bottom of the readme)
 
----
+Parameters
+===
 
 Other parameters that you can pass to the `vsFor` directive:
 

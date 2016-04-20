@@ -28,7 +28,7 @@ import {VsFor} from '../src/ng2-vs-for.js';
   template: `
     <div class="container" [ngClass]="{tall: isTall}" *ngIf="shown">
       <div *vsFor="items; size:getItemSize; offsetBefore:100; offsetAfter: 100; excess: 3; scrollParent:'.container'; #_items = vsCollection; #_startIndex = vsStartIndex">
-        <div *ngFor="#item of _items" title="{{item.index}}" style="height: {{item.index % 2 ? '25px' : '50px'}}" class="repeat-item">
+        <div *ngFor="#item of _items" title="{{item.index}}" [ngStyle]="{height: item.index % 2 ? '25px' : '50px'}" class="repeat-item">
           {{ item.value }} {{ _startIndex }}
         </div>
       </div>

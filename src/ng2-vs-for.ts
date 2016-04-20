@@ -4,7 +4,6 @@ import {
   TemplateRef,
   ElementRef,
   Renderer,
-  ViewRef,
   EmbeddedViewRef,
   NgZone,
 } from 'angular2/core';
@@ -76,7 +75,12 @@ function getScrollOffset(vsElement: HTMLElement, scrollElement: HTMLElement | Wi
   selector: '[vsFor]',
   inputs: [
     'originalCollection: vsFor',
-    'vsForGetSize'
+    'vsSize: vsForSize',
+    'vsOffsetAfter: vsForOffsetAfter',
+    'vsOffsetBefore: vsForOffsetBefore',
+    'vsExcess: vsForExcess',
+    'tagName: vsForTagName',
+    'vsScrollParent: vsForScrollParent'
   ]
 })
 
@@ -88,7 +92,7 @@ export class VsFor {
 	after                 : HTMLElement;
 	view                  : EmbeddedViewRef;
 	parent                : HTMLElement;
-	tagName               : string;
+	tagName               : string = 'div';
 	__horizontal          : boolean;
 	__autoSize            : boolean;
 	__options             : any;
@@ -110,11 +114,10 @@ export class VsFor {
 	onWindowResize        : any;
 	onZone							  : any;
 
-	vsSize                : number;
+	vsSize                : any;
 	vsOffsetBefore        : number = 0;
 	vsOffsetAfter         : number = 0;
 	vsExcess              : number = 2;
-	vsForGetSize					: any;
   set originalCollection(value: any[]) {
     this._originalCollection = value || [];
     if (this.scrollParent) {
@@ -146,9 +149,6 @@ export class VsFor {
     this.view = this._viewContainer.createEmbeddedView(this._templateRef);
     this.parent = this._element.nativeElement.nextElementSibling;
 
-    const tagName = this.parent.attributes['vsTag'] ? this.parent.attributes['vsTag'].value : 'div';
-    this.initPlaceholders(tagName);
-
     let _prevClientSize;
     const reinitOnClientHeightChange = () => {
     	if (!this.scrollParent) {
@@ -167,25 +167,15 @@ export class VsFor {
       }
     };
 
-  	const attrs = ['vsSize', 'vsOffsetAfter', 'vsOffsetBefore', 'vsExcess'];
-    this.onZone = this._ngZone.onStable.subscribe(() => {
-    	attrs.forEach(attr => {
-    		let sthChanged = false;
-	      if (this.parent.attributes[attr]) {
-	      	if (+this.parent.attributes[attr].value !== this[attr]) {
-	      		sthChanged = true;
-	      	}
-
-	      	this[attr] = +this.parent.attributes[attr].value;
-	      }
-
-	    	if (sthChanged) {
-	    		this.reinitialize();
-	    	}
-    	});
-
-    	reinitOnClientHeightChange();
-    });
+    this.onZone = this._ngZone.onStable.subscribe(reinitOnClientHeightChange);
+  }
+  ngOnChanges() {
+    if (this.scrollParent) {
+      this.refresh();
+    }
+    else {
+      this.postDigest(this.refresh.bind(this));
+    }
   }
   postDigest(fn) {
     const subscription:any = this._ngZone.onStable.subscribe(() => {
@@ -193,10 +183,10 @@ export class VsFor {
       subscription.unsubscribe();
     });
   }
-  initPlaceholders(tagName: string) {
-    this.before = document.createElement(tagName);
+  initPlaceholders() {
+    this.before = document.createElement(this.tagName);
     this.before.className = 'vsFor-before';
-    this.after = document.createElement(tagName);
+    this.after = document.createElement(this.tagName);
     this.after.className = 'vsFor-after';
     this.parent.insertBefore(this.before, this.parent.childNodes[0]);
     this.parent.appendChild(this.after);
@@ -211,6 +201,8 @@ export class VsFor {
     }
   }
   ngOnInit() {
+    // console.log(this.vsSize, this.vsOffsetBefore, this.vsOffsetAfter, this.vsExcess, this.vsScrollParent, this.vsAutoresize, this.tagName);
+    this.initPlaceholders();
     this.__horizontal = false;
     this.__autoSize = true;
     this.__options = {};
@@ -218,8 +210,8 @@ export class VsFor {
     this.offsetSize = this.__horizontal ? 'offsetWidth' : 'offsetHeight';
     this.scrollPos = this.__horizontal ? 'scrollLeft' : 'scrollTop';
 
-    if (this.parent.attributes['vsScrollParent']) {
-      this.scrollParent = closestElement(this.parent, this.parent.attributes['vsScrollParent'].value);
+    if (this.vsScrollParent) {
+      this.scrollParent = closestElement(this.parent, this.vsScrollParent);
     }
     else {
       this.scrollParent = this.parent;
@@ -229,7 +221,7 @@ export class VsFor {
 
     this.totalSize = 0;
 
-    if (this.vsForGetSize) {
+    if (typeof this.vsSize !== 'undefined') {
       this.sizesCumulative = [];
     }
 
@@ -241,7 +233,7 @@ export class VsFor {
     });
 
     this.onWindowResize = () => {
-      if (this.parent.attributes['vsAutoresize']) {
+      if (this.vsAutoresize) {
         this.__autoSize = true;
         this._ngZone.run(() => {
 	        this.setAutoSize();
@@ -303,22 +295,17 @@ export class VsFor {
       this.originalLength = 0;
       this.updateTotalSize(0);
       this.sizesCumulative = [0];
-      // return;
     }
     else {
       this.originalLength = this.originalCollection.length;
-      if (this.vsForGetSize) {
+      if (typeof this.vsSize !== 'undefined') {
         this.sizes = this.originalCollection.map((item) => {
-        	return this.vsForGetSize(item);
-          // var s = $scope.$new(false);
-          // angular.extend(s, item);
-          // s[lhs] = item;
-          // var size = ($attrs.vsSize || $attrs.vsSizeProperty) ?
-          //     s.$eval($attrs.vsSize || $attrs.vsSizeProperty) :
-          //     $scope.elementSize;
-          // s.$destroy();
-          // let size = 10; // TODO
-          // return size;
+          if (typeof this.vsSize === 'function') {
+          	return this.vsSize(item);
+          }
+          else {
+            return +this.vsSize; // number or string
+          }
         });
         let sum = 0;
         this.sizesCumulative = this.sizes.map((size) => {
@@ -345,20 +332,21 @@ export class VsFor {
     this._minStartIndex = this.originalLength;
     this._maxEndIndex = 0;
 
-    this.updateTotalSize(this.vsForGetSize ?
+    this.updateTotalSize(typeof this.vsSize !== 'undefined' ?
       this.sizesCumulative[this.originalLength] :
       this.elementSize * this.originalLength
     );
     this.updateInnerCollection();
   }
   setAutoSize() {
-    if (this.__autoSize) {
+    if (typeof this.vsSize !== 'undefined') {
+      this._ngZone.run(() => {
+        this.refresh();
+      });
+    }
+    else if (this.__autoSize) {
       let gotSomething = false;
-    	if (typeof this.vsSize !== 'undefined') {
-    		gotSomething = true;
-    		this.elementSize = this.vsSize;
-    	}
-    	else if (this.parent.offsetHeight || this.parent.offsetWidth) { // element is visible
+    	if (this.parent.offsetHeight || this.parent.offsetWidth) { // element is visible
         const child = this.parent.children[1];
 
         if (child[this.offsetSize]) {
@@ -388,7 +376,7 @@ export class VsFor {
     let __startIndex = this.startIndex;
     let __endIndex = this.endIndex;
 
-    if (this.vsForGetSize) {
+    if (typeof this.vsSize !== 'undefined') {
       __startIndex = 0;
       while (this.sizesCumulative[__startIndex] < $scrollPosition - this.vsOffsetBefore - scrollOffset) {
         __startIndex++;
@@ -483,7 +471,7 @@ export class VsFor {
     return digestRequired;
   }
   _getOffset(index: number) {
-    if (this.vsForGetSize) {
+    if (typeof this.vsSize !== 'undefined') {
       return this.sizesCumulative[index + this.startIndex] + this.vsOffsetBefore;
     }
 

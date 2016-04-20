@@ -74,13 +74,12 @@ var VsFor = (function () {
         this._ngZone = _ngZone;
         this._originalCollection = [];
         this._slicedCollection = [];
+        this.tagName = 'div';
         this.vsOffsetBefore = 0;
         this.vsOffsetAfter = 0;
         this.vsExcess = 2;
         this.view = this._viewContainer.createEmbeddedView(this._templateRef);
         this.parent = this._element.nativeElement.nextElementSibling;
-        var tagName = this.parent.attributes['vsTag'] ? this.parent.attributes['vsTag'].value : 'div';
-        this.initPlaceholders(tagName);
         var _prevClientSize;
         var reinitOnClientHeightChange = function () {
             if (!_this.scrollParent) {
@@ -97,22 +96,7 @@ var VsFor = (function () {
                 _prevClientSize = ch;
             }
         };
-        var attrs = ['vsSize', 'vsOffsetAfter', 'vsOffsetBefore', 'vsExcess'];
-        this.onZone = this._ngZone.onStable.subscribe(function () {
-            attrs.forEach(function (attr) {
-                var sthChanged = false;
-                if (_this.parent.attributes[attr]) {
-                    if (+_this.parent.attributes[attr].value !== _this[attr]) {
-                        sthChanged = true;
-                    }
-                    _this[attr] = +_this.parent.attributes[attr].value;
-                }
-                if (sthChanged) {
-                    _this.reinitialize();
-                }
-            });
-            reinitOnClientHeightChange();
-        });
+        this.onZone = this._ngZone.onStable.subscribe(reinitOnClientHeightChange);
     }
     Object.defineProperty(VsFor.prototype, "originalCollection", {
         get: function () {
@@ -143,16 +127,24 @@ var VsFor = (function () {
         enumerable: true,
         configurable: true
     });
+    VsFor.prototype.ngOnChanges = function () {
+        if (this.scrollParent) {
+            this.refresh();
+        }
+        else {
+            this.postDigest(this.refresh.bind(this));
+        }
+    };
     VsFor.prototype.postDigest = function (fn) {
         var subscription = this._ngZone.onStable.subscribe(function () {
             fn();
             subscription.unsubscribe();
         });
     };
-    VsFor.prototype.initPlaceholders = function (tagName) {
-        this.before = document.createElement(tagName);
+    VsFor.prototype.initPlaceholders = function () {
+        this.before = document.createElement(this.tagName);
         this.before.className = 'vsFor-before';
-        this.after = document.createElement(tagName);
+        this.after = document.createElement(this.tagName);
         this.after.className = 'vsFor-after';
         this.parent.insertBefore(this.before, this.parent.childNodes[0]);
         this.parent.appendChild(this.after);
@@ -167,21 +159,23 @@ var VsFor = (function () {
     };
     VsFor.prototype.ngOnInit = function () {
         var _this = this;
+        // console.log(this.vsSize, this.vsOffsetBefore, this.vsOffsetAfter, this.vsExcess, this.vsScrollParent, this.vsAutoresize, this.tagName);
+        this.initPlaceholders();
         this.__horizontal = false;
         this.__autoSize = true;
         this.__options = {};
         this.clientSize = this.__horizontal ? 'clientWidth' : 'clientHeight';
         this.offsetSize = this.__horizontal ? 'offsetWidth' : 'offsetHeight';
         this.scrollPos = this.__horizontal ? 'scrollLeft' : 'scrollTop';
-        if (this.parent.attributes['vsScrollParent']) {
-            this.scrollParent = closestElement(this.parent, this.parent.attributes['vsScrollParent'].value);
+        if (this.vsScrollParent) {
+            this.scrollParent = closestElement(this.parent, this.vsScrollParent);
         }
         else {
             this.scrollParent = this.parent;
         }
         this.elementSize = getClientSize(this.scrollParent, this.clientSize) || 50;
         this.totalSize = 0;
-        if (this.vsForGetSize) {
+        if (typeof this.vsSize !== 'undefined') {
             this.sizesCumulative = [];
         }
         this.startIndex = 0;
@@ -190,7 +184,7 @@ var VsFor = (function () {
             _this.updateInnerCollection();
         });
         this.onWindowResize = function () {
-            if (_this.parent.attributes['vsAutoresize']) {
+            if (_this.vsAutoresize) {
                 _this.__autoSize = true;
                 _this._ngZone.run(function () {
                     _this.setAutoSize();
@@ -248,18 +242,14 @@ var VsFor = (function () {
         }
         else {
             this.originalLength = this.originalCollection.length;
-            if (this.vsForGetSize) {
+            if (typeof this.vsSize !== 'undefined') {
                 this.sizes = this.originalCollection.map(function (item) {
-                    return _this.vsForGetSize(item);
-                    // var s = $scope.$new(false);
-                    // angular.extend(s, item);
-                    // s[lhs] = item;
-                    // var size = ($attrs.vsSize || $attrs.vsSizeProperty) ?
-                    //     s.$eval($attrs.vsSize || $attrs.vsSizeProperty) :
-                    //     $scope.elementSize;
-                    // s.$destroy();
-                    // let size = 10; // TODO
-                    // return size;
+                    if (typeof _this.vsSize === 'function') {
+                        return _this.vsSize(item);
+                    }
+                    else {
+                        return +_this.vsSize; // number or string
+                    }
                 });
                 var sum_1 = 0;
                 this.sizesCumulative = this.sizes.map(function (size) {
@@ -284,20 +274,21 @@ var VsFor = (function () {
         this._prevEndIndex = void 0;
         this._minStartIndex = this.originalLength;
         this._maxEndIndex = 0;
-        this.updateTotalSize(this.vsForGetSize ?
+        this.updateTotalSize(typeof this.vsSize !== 'undefined' ?
             this.sizesCumulative[this.originalLength] :
             this.elementSize * this.originalLength);
         this.updateInnerCollection();
     };
     VsFor.prototype.setAutoSize = function () {
         var _this = this;
-        if (this.__autoSize) {
+        if (typeof this.vsSize !== 'undefined') {
+            this._ngZone.run(function () {
+                _this.refresh();
+            });
+        }
+        else if (this.__autoSize) {
             var gotSomething = false;
-            if (typeof this.vsSize !== 'undefined') {
-                gotSomething = true;
-                this.elementSize = this.vsSize;
-            }
-            else if (this.parent.offsetHeight || this.parent.offsetWidth) {
+            if (this.parent.offsetHeight || this.parent.offsetWidth) {
                 var child = this.parent.children[1];
                 if (child[this.offsetSize]) {
                     gotSomething = true;
@@ -318,7 +309,7 @@ var VsFor = (function () {
         var scrollOffset = this.parent === this.scrollParent ? 0 : getScrollOffset(this.parent, this.scrollParent, this.__horizontal);
         var __startIndex = this.startIndex;
         var __endIndex = this.endIndex;
-        if (this.vsForGetSize) {
+        if (typeof this.vsSize !== 'undefined') {
             __startIndex = 0;
             while (this.sizesCumulative[__startIndex] < $scrollPosition - this.vsOffsetBefore - scrollOffset) {
                 __startIndex++;
@@ -385,7 +376,7 @@ var VsFor = (function () {
         return digestRequired;
     };
     VsFor.prototype._getOffset = function (index) {
-        if (this.vsForGetSize) {
+        if (typeof this.vsSize !== 'undefined') {
             return this.sizesCumulative[index + this.startIndex] + this.vsOffsetBefore;
         }
         return (index + this.startIndex) * this.elementSize + this.vsOffsetBefore;
@@ -395,7 +386,12 @@ var VsFor = (function () {
             selector: '[vsFor]',
             inputs: [
                 'originalCollection: vsFor',
-                'vsForGetSize'
+                'vsSize: vsForSize',
+                'vsOffsetAfter: vsForOffsetAfter',
+                'vsOffsetBefore: vsForOffsetBefore',
+                'vsExcess: vsForExcess',
+                'tagName: vsForTagName',
+                'vsScrollParent: vsForScrollParent'
             ]
         }), 
         __metadata('design:paramtypes', [core_1.ElementRef, core_1.ViewContainerRef, core_1.TemplateRef, core_1.Renderer, core_1.NgZone])

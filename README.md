@@ -5,6 +5,8 @@ ng2-vs-for 1.0.10 [![npm version](https://badge.fury.io/js/ng2-vs-for.svg)](http
 
 ---
 
+The name stands for **Virtual Scroll For**. It manipulates the collection you want to `ngFor` over in a way that only elements that are actually visible for the user are rendered in the DOM. So if you repeat over a thousand items only a few of them are rendered in the DOM, because the user can't see the rest anyway. And it takes time for the browser to render so many elements, which also might have some event listeners/bindings etc. So you should see a considerable boost in performance.
+
 Examples
 ===
 

@@ -71,6 +71,18 @@ function getScrollOffset(vsElement: HTMLElement, scrollElement: HTMLElement | Wi
   return correction;
 }
 
+function nextElementSibling(el) {
+  if (el.nextElementSibling) {
+    return el.nextElementSibling;
+  }
+
+  do {
+    el = el.nextSibling;
+  } while (el && el.nodeType !== 1);
+
+  return el;
+}
+
 @Directive({
   selector: '[vsFor]',
   inputs: [
@@ -149,24 +161,21 @@ export class VsFor {
     private _renderer      : Renderer,
     private _ngZone        : NgZone
   ) {
-    this.view = this._viewContainer.createEmbeddedView(this._templateRef);
-    this.parent = this._element.nativeElement.nextElementSibling;
-
     let _prevClientSize;
     const reinitOnClientHeightChange = () => {
-    	if (!this.scrollParent) {
-    		return;
-    	}
+      if (!this.scrollParent) {
+        return;
+      }
 
       const ch = getClientSize(this.scrollParent, this.clientSize);
       if (ch !== _prevClientSize) {
-      	_prevClientSize = ch;
-      	this._ngZone.run(() => {
+        _prevClientSize = ch;
+        this._ngZone.run(() => {
           this.refresh();
-      	});
+        });
       }
       else {
-	      _prevClientSize = ch;
+        _prevClientSize = ch;
       }
     };
 
@@ -205,6 +214,9 @@ export class VsFor {
   }
   ngOnInit() {
     // console.log(this.vsSize, this.vsOffsetBefore, this.vsOffsetAfter, this.vsExcess, this.vsScrollParent, this.vsAutoresize, this.tagName, this.__horizontal);
+    this.view = this._viewContainer.createEmbeddedView(this._templateRef);
+    this.parent = nextElementSibling(this._element.nativeElement);
+
     this.initPlaceholders();
     this.__horizontal = false;
     this.__autoSize = true;

@@ -64,6 +64,15 @@ function getScrollOffset(vsElement, scrollElement, isHorizontal) {
         (scrollElement === window ? getWindowScroll() : scrollElement)[isHorizontal ? 'scrollLeft' : 'scrollTop'];
     return correction;
 }
+function nextElementSibling(el) {
+    if (el.nextElementSibling) {
+        return el.nextElementSibling;
+    }
+    do {
+        el = el.nextSibling;
+    } while (el && el.nodeType !== 1);
+    return el;
+}
 var VsFor = (function () {
     function VsFor(_element, _viewContainer, _templateRef, _renderer, _ngZone) {
         var _this = this;
@@ -79,8 +88,6 @@ var VsFor = (function () {
         this.vsOffsetBefore = 0;
         this.vsOffsetAfter = 0;
         this.vsExcess = 2;
-        this.view = this._viewContainer.createEmbeddedView(this._templateRef);
-        this.parent = this._element.nativeElement.nextElementSibling;
         var _prevClientSize;
         var reinitOnClientHeightChange = function () {
             if (!_this.scrollParent) {
@@ -161,6 +168,8 @@ var VsFor = (function () {
     VsFor.prototype.ngOnInit = function () {
         var _this = this;
         // console.log(this.vsSize, this.vsOffsetBefore, this.vsOffsetAfter, this.vsExcess, this.vsScrollParent, this.vsAutoresize, this.tagName, this.__horizontal);
+        this.view = this._viewContainer.createEmbeddedView(this._templateRef);
+        this.parent = nextElementSibling(this._element.nativeElement);
         this.initPlaceholders();
         this.__horizontal = false;
         this.__autoSize = true;

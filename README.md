@@ -1,4 +1,4 @@
-ng2-vs-for 1.0.10 [![npm version](https://badge.fury.io/js/ng2-vs-for.svg)](https://badge.fury.io/js/ng2-vs-for)
+ng2-vs-for 1.0.11 [![npm version](https://badge.fury.io/js/ng2-vs-for.svg)](https://badge.fury.io/js/ng2-vs-for)
 ===
 
 **This is a port of https://github.com/kamilkp/angular-vs-repeat for Angular2**
@@ -78,7 +78,7 @@ Other parameters that you can pass to the `vsFor` directive:
  - `horizontal` (hooks to scrolling horizontally and the optional `size` parameter calculates widths instead of heights)
  - `tagName` (defaults to `div`) - should be the same type as the tag name of the element you put the `ngFor` directive on
  - `scrollParent` (defaults to direct parent element) - a selector of the closest element that is the scrollable container for the repeated items. You can set `window` as a scroll parent in case the main window scrollbar should be used.
- 
+
 Example with some more parameters:
 
 ```html

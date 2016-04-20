@@ -75,6 +75,7 @@ var VsFor = (function () {
         this._originalCollection = [];
         this._slicedCollection = [];
         this.tagName = 'div';
+        this.__horizontal = false;
         this.vsOffsetBefore = 0;
         this.vsOffsetAfter = 0;
         this.vsExcess = 2;
@@ -159,7 +160,7 @@ var VsFor = (function () {
     };
     VsFor.prototype.ngOnInit = function () {
         var _this = this;
-        // console.log(this.vsSize, this.vsOffsetBefore, this.vsOffsetAfter, this.vsExcess, this.vsScrollParent, this.vsAutoresize, this.tagName);
+        // console.log(this.vsSize, this.vsOffsetBefore, this.vsOffsetAfter, this.vsExcess, this.vsScrollParent, this.vsAutoresize, this.tagName, this.__horizontal);
         this.initPlaceholders();
         this.__horizontal = false;
         this.__autoSize = true;
@@ -243,9 +244,9 @@ var VsFor = (function () {
         else {
             this.originalLength = this.originalCollection.length;
             if (typeof this.vsSize !== 'undefined') {
-                this.sizes = this.originalCollection.map(function (item) {
+                this.sizes = this.originalCollection.map(function (item, index) {
                     if (typeof _this.vsSize === 'function') {
-                        return _this.vsSize(item);
+                        return _this.vsSize(item, index);
                     }
                     else {
                         return +_this.vsSize; // number or string
@@ -391,7 +392,9 @@ var VsFor = (function () {
                 'vsOffsetBefore: vsForOffsetBefore',
                 'vsExcess: vsForExcess',
                 'tagName: vsForTagName',
-                'vsScrollParent: vsForScrollParent'
+                'vsScrollParent: vsForScrollParent',
+                '__horizontal: vsForHorizontal',
+                'vsAutoresize: vsForAutoresize'
             ]
         }), 
         __metadata('design:paramtypes', [core_1.ElementRef, core_1.ViewContainerRef, core_1.TemplateRef, core_1.Renderer, core_1.NgZone])

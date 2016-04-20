@@ -80,7 +80,9 @@ function getScrollOffset(vsElement: HTMLElement, scrollElement: HTMLElement | Wi
     'vsOffsetBefore: vsForOffsetBefore',
     'vsExcess: vsForExcess',
     'tagName: vsForTagName',
-    'vsScrollParent: vsForScrollParent'
+    'vsScrollParent: vsForScrollParent',
+    '__horizontal: vsForHorizontal',
+    'vsAutoresize: vsForAutoresize'
   ]
 })
 
@@ -93,10 +95,9 @@ export class VsFor {
 	view                  : EmbeddedViewRef;
 	parent                : HTMLElement;
 	tagName               : string = 'div';
-	__horizontal          : boolean;
+	__horizontal          : boolean = false;
 	__autoSize            : boolean;
 	__options             : any;
-	__isNgRepeatStart     : boolean;
 	scrollParent          : HTMLElement;
 	clientSize            : string;
 	offsetSize            : string;
@@ -203,7 +204,7 @@ export class VsFor {
     }
   }
   ngOnInit() {
-    // console.log(this.vsSize, this.vsOffsetBefore, this.vsOffsetAfter, this.vsExcess, this.vsScrollParent, this.vsAutoresize, this.tagName);
+    // console.log(this.vsSize, this.vsOffsetBefore, this.vsOffsetAfter, this.vsExcess, this.vsScrollParent, this.vsAutoresize, this.tagName, this.__horizontal);
     this.initPlaceholders();
     this.__horizontal = false;
     this.__autoSize = true;
@@ -301,9 +302,9 @@ export class VsFor {
     else {
       this.originalLength = this.originalCollection.length;
       if (typeof this.vsSize !== 'undefined') {
-        this.sizes = this.originalCollection.map((item) => {
+        this.sizes = this.originalCollection.map((item, index) => {
           if (typeof this.vsSize === 'function') {
-          	return this.vsSize(item);
+          	return this.vsSize(item, index);
           }
           else {
             return +this.vsSize; // number or string

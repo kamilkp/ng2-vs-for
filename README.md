@@ -33,7 +33,7 @@ import {VsFor} from 'ng2-vs-for';
 import {Component} from 'angular2/core';
 
 @Component({
-    name: 'some-component',
+    selector: 'some-component',
     directives: [VsFor],
     template: `
         <div *vsFor="items; size:getSize; #_items = vsCollection">

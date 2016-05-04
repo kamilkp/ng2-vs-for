@@ -6,7 +6,7 @@ import {
   Renderer,
   EmbeddedViewRef,
   NgZone,
-} from 'angular2/core';
+} from '@angular/core';
 
 const dde:any = document.documentElement,
   matchingFunction = dde.matches ? 'matches' :
@@ -149,7 +149,8 @@ export class VsFor {
   }
   set slicedCollection(value: any[]) {
     this._slicedCollection = value;
-    this.view.setLocal('vsCollection', this._slicedCollection);
+    this.view.context.vsCollection = this._slicedCollection;
+    // this.view.setLocal('vsCollection', this._slicedCollection);
   }
   get slicedCollection() {
     return this._slicedCollection;
@@ -466,7 +467,8 @@ export class VsFor {
 
     if (digestRequired) {
       this.slicedCollection = this.originalCollection.slice(this.startIndex, this.endIndex);
-      this.view.setLocal('vsStartIndex', this.startIndex);
+      // this.view.setLocal('vsStartIndex', this.startIndex);
+      this.view.vsStartIndex = this.startIndex;
 
       // TODO figure out these events
       // Emit the event

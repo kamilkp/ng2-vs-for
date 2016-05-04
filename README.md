@@ -1,5 +1,10 @@
-ng2-vs-for 1.0.11 [![npm version](https://badge.fury.io/js/ng2-vs-for.svg)](https://badge.fury.io/js/ng2-vs-for)
+ng2-vs-for 1.1.0 [![npm version](https://badge.fury.io/js/ng2-vs-for.svg)](https://badge.fury.io/js/ng2-vs-for)
 ===
+
+**Verion 1.1.x if for angular2.0.0-rc +**
+**Use 1.0.11 for angualr2.0.0-beta**
+
+---
 
 **This is a port of https://github.com/kamilkp/angular-vs-repeat for Angular2**
 

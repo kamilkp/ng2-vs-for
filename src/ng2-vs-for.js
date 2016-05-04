@@ -8,7 +8,7 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
-var core_1 = require('angular2/core');
+var core_1 = require('@angular/core');
 var dde = document.documentElement, matchingFunction = dde.matches ? 'matches' :
     dde.matchesSelector ? 'matchesSelector' :
         dde.webkitMatches ? 'webkitMatches' :
@@ -130,7 +130,8 @@ var VsFor = (function () {
         },
         set: function (value) {
             this._slicedCollection = value;
-            this.view.setLocal('vsCollection', this._slicedCollection);
+            this.view.context.vsCollection = this._slicedCollection;
+            // this.view.setLocal('vsCollection', this._slicedCollection);
         },
         enumerable: true,
         configurable: true
@@ -370,7 +371,8 @@ var VsFor = (function () {
         // console.warn(this.startIndex, this.endIndex);
         if (digestRequired) {
             this.slicedCollection = this.originalCollection.slice(this.startIndex, this.endIndex);
-            this.view.setLocal('vsStartIndex', this.startIndex);
+            // this.view.setLocal('vsStartIndex', this.startIndex);
+            this.view.vsStartIndex = this.startIndex;
             // TODO figure out these events
             // Emit the event
             // $scope.$emit('vsRepeatInnerCollectionUpdated', this.startIndex, this.endIndex, this._prevStartIndex, this._prevEndIndex);

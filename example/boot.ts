@@ -1,7 +1,7 @@
- ///<reference path="../node_modules/angular2/typings/browser.d.ts"/>
 
-import {bootstrap} from 'angular2/platform/browser';
-import {Component} from 'angular2/core';
+
+import {bootstrap} from '@angular/platform-browser-dynamic';
+import {Component} from '@angular/core';
 import {VsFor} from '../src/ng2-vs-for.js';
 
 @Component({
@@ -27,8 +27,8 @@ import {VsFor} from '../src/ng2-vs-for.js';
   `],
   template: `
     <div class="container" [ngClass]="{tall: isTall}" *ngIf="shown">
-      <div *vsFor="items; size:getItemSize; offsetBefore:100; offsetAfter: 100; excess: 3; scrollParent:'.container'; #_items = vsCollection; #_startIndex = vsStartIndex">
-        <div *ngFor="#item of _items" title="{{item.index}}" [ngStyle]="{height: item.index % 2 ? '25px' : '50px'}" class="repeat-item">
+      <div *vsFor="items; size:getItemSize; offsetBefore:100; offsetAfter: 100; excess: 3; scrollParent:'.container'; let _items = vsCollection; let _startIndex = vsStartIndex">
+        <div *ngFor="let item of _items" title="{{item.index}}" [ngStyle]="{height: item.index % 2 ? '25px' : '50px'}" class="repeat-item">
           {{ item.value }} {{ _startIndex }}
         </div>
       </div>

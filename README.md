@@ -3,7 +3,7 @@ ng2-vs-for 1.1.0 [![npm version](https://badge.fury.io/js/ng2-vs-for.svg)](https
 
 **Use verion 1.1.x with angular2.0.0-rc**
 
-**Use version 1.0.11 with angualr2.0.0-beta**
+**Use version 1.0.11 with angular2.0.0-beta**
 
 ---
 

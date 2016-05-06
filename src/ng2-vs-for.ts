@@ -104,7 +104,7 @@ export class VsFor {
 	originalLength        : number;
 	before                : HTMLElement;
 	after                 : HTMLElement;
-	view                  : EmbeddedViewRef;
+	view                  : EmbeddedViewRef<any>;
 	parent                : HTMLElement;
 	tagName               : string = 'div';
 	__horizontal          : boolean = false;
@@ -158,7 +158,7 @@ export class VsFor {
   constructor(
     private _element       : ElementRef,
     private _viewContainer : ViewContainerRef,
-    private _templateRef   : TemplateRef,
+    private _templateRef   : TemplateRef<any>,
     private _renderer      : Renderer,
     private _ngZone        : NgZone
   ) {
@@ -468,7 +468,7 @@ export class VsFor {
     if (digestRequired) {
       this.slicedCollection = this.originalCollection.slice(this.startIndex, this.endIndex);
       // this.view.setLocal('vsStartIndex', this.startIndex);
-      this.view.vsStartIndex = this.startIndex;
+      this.view.context.vsStartIndex = this.startIndex;
 
       // TODO figure out these events
       // Emit the event

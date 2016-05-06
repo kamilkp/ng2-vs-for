@@ -372,7 +372,7 @@ var VsFor = (function () {
         if (digestRequired) {
             this.slicedCollection = this.originalCollection.slice(this.startIndex, this.endIndex);
             // this.view.setLocal('vsStartIndex', this.startIndex);
-            this.view.vsStartIndex = this.startIndex;
+            this.view.context.vsStartIndex = this.startIndex;
             // TODO figure out these events
             // Emit the event
             // $scope.$emit('vsRepeatInnerCollectionUpdated', this.startIndex, this.endIndex, this._prevStartIndex, this._prevEndIndex);

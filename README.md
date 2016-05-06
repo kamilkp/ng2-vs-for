@@ -1,8 +1,9 @@
 ng2-vs-for 1.1.1 [![npm version](https://badge.fury.io/js/ng2-vs-for.svg)](https://badge.fury.io/js/ng2-vs-for)
 ===
 
-**Verion 1.1.x if for angular2.0.0-rc +**
-**Use 1.0.11 for angualr2.0.0-beta**
+**Use verion 1.1.x with angular2.0.0-rc**
+
+**Use version 1.0.11 with angular2.0.0-beta**
 
 ---
 

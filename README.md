@@ -26,7 +26,7 @@ all items shall have the same height
 
 ```html
 <div *vsFor="items; let _items = vsCollection">
-    <div *ngFor="item of _items">
+    <div *ngFor="let item of _items">
         <!-- item html here -->
     </div>
 </div>
@@ -42,8 +42,8 @@ import {Component} from 'angular2/core';
     selector: 'some-component',
     directives: [VsFor],
     template: `
-        <div *vsFor="items; size:getSize; #_items = vsCollection">
-            <div *ngFor="#item of _items">
+        <div *vsFor="items; size:getSize; let _items = vsCollection">
+            <div *ngFor="let item of _items">
                 <!-- item html here -->
             </div>
         </div>

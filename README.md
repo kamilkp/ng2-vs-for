@@ -25,8 +25,8 @@ Basic usage:
 all items shall have the same height
 
 ```html
-<div *vsFor="items; #_items = vsCollection">
-    <div *ngFor="#item of _items">
+<div *vsFor="items; let _items = vsCollection">
+    <div *ngFor="item of _items">
         <!-- item html here -->
     </div>
 </div>

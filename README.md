@@ -32,7 +32,7 @@ all items shall have the same height
 </div>
 ```
 
-Items have varoius sizes but they are known up front (calculatable based on their properties)
+Items have various sizes but they are known up front (calculatable based on their properties)
 
 ```javascript
 import {VsFor} from 'ng2-vs-for';

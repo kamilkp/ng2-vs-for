@@ -6,6 +6,7 @@ import {
   Renderer,
   EmbeddedViewRef,
   NgZone,
+  ChangeDetectorRef,
 } from '@angular/core';
 
 const dde:any = document.documentElement,
@@ -160,7 +161,8 @@ export class VsFor {
     private _viewContainer : ViewContainerRef,
     private _templateRef   : TemplateRef<any>,
     private _renderer      : Renderer,
-    private _ngZone        : NgZone
+    private _ngZone        : NgZone,
+    private _changeDetectorRef: ChangeDetectorRef
   ) {
     let _prevClientSize;
     const reinitOnClientHeightChange = () => {
@@ -483,6 +485,7 @@ export class VsFor {
 
       this.before.style[layoutProp] = o1 + 'px';
       this.after.style[layoutProp] = (total - o2) + 'px';
+      this._changeDetectorRef.markForCheck();
     }
 
     return digestRequired;

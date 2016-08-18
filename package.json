@@ -14,7 +14,8 @@
     "email": "kamilkp@gmail.com",
     "url": "http://github.com/kamilkp"
   },
-  "main": "src/ng2-vs-for.ts",
+  "main": "./index.js",
+  "typings": "./index.d.ts",
   "repository": {
     "type": "git",
     "url": "https://github.com/kamilkp/ng2-vs-for.git"

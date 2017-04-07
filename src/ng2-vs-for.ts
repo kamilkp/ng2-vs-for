@@ -6,7 +6,7 @@ import {
   Renderer,
   EmbeddedViewRef,
   NgZone,
-  ChangeDetectorRef,
+  IterableDiffers
 } from '@angular/core';
 
 const dde:any = document.documentElement,
@@ -100,7 +100,7 @@ function nextElementSibling(el) {
 })
 
 export class VsFor {
-  _originalCollection   = [];
+    _originalCollection   = [];
 	_slicedCollection     = [];
 	originalLength        : number;
 	before                : HTMLElement;
@@ -132,8 +132,9 @@ export class VsFor {
 	vsOffsetBefore        : number = 0;
 	vsOffsetAfter         : number = 0;
 	vsExcess              : number = 2;
-  vsScrollParent        : string;
-  vsAutoresize          : boolean;
+    vsScrollParent        : string;
+    vsAutoresize          : boolean;
+    differ                : any;
   set originalCollection(value: any[]) {
     this._originalCollection = value || [];
     if (this.scrollParent) {
@@ -162,8 +163,10 @@ export class VsFor {
     private _templateRef   : TemplateRef<any>,
     private _renderer      : Renderer,
     private _ngZone        : NgZone,
-    private _changeDetectorRef: ChangeDetectorRef
+    private differs        : IterableDiffers
   ) {
+    this.differ = differs.find([]).create(null);
+
     let _prevClientSize;
     const reinitOnClientHeightChange = () => {
       if (!this.scrollParent) {
@@ -190,6 +193,12 @@ export class VsFor {
     }
     else {
       this.postDigest(this.refresh.bind(this));
+    }
+  }
+  ngDoCheck() {
+    var changes = this.differ.diff(this.originalCollection); // check for changes
+    if (changes) {
+      this.refresh();
     }
   }
   postDigest(fn) {
@@ -485,7 +494,6 @@ export class VsFor {
 
       this.before.style[layoutProp] = o1 + 'px';
       this.after.style[layoutProp] = (total - o2) + 'px';
-      this._changeDetectorRef.markForCheck();
     }
 
     return digestRequired;

@@ -2,7 +2,7 @@
   "name": "ng-vs-for",
   "version": "1.2.5",
   "peerDependencies": {
-    "@angular/common": "^4.0.0 - ^7.0.0",
-    "@angular/core": "^4.0.0 - ^7.0.0"
+    "@angular/common": "^6.0.0 || ^7.0.0",
+    "@angular/core": "^6.0.0 || ^7.0.0"
   }
 }

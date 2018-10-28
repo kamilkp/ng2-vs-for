@@ -1,0 +1,41 @@
+*,
+body,
+html {
+  font-size: 20px;
+}
+
+::-webkit-scrollbar {
+  height: .5rem;
+  width: .5rem;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(156, 20, 20, 0.3);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(156, 20, 20, 0.5);
+}
+
+::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+.container {
+  border: 2px solid rgba(156, 20, 20, 0.1);
+  box-shadow: 2px 2px 5px 0 rgba(0,0,0,0.2);
+  margin: 5em auto;
+  height: 15.5em;
+  width: 80%;
+  overflow-y: auto;
+  color: #555;
+  /* background: rgba(156, 20, 20, 0.4); */
+}
+
+.row {
+  padding: .5em 2em;
+  justify-content: space-between;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  /* box-shadow: 2px 2px 5px 0 rgba(0,0,0,0.2); */
+  display: flex;
+}

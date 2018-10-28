@@ -1,0 +1,12 @@
+<button (click)="refresh()">
+  refresh</button>
+<button (click)="clear()">clear</button>
+<div class="container">
+  <div *vsFor="items; let _items = vsCollection; scrollParent:'.container';">
+    <div class="row" *ngFor="let item of _items">
+      <span>{{item.index}}</span>
+      <span>{{item.field1}}</span>
+      <span>{{item.field2}}</span>
+    </div>
+  </div>
+</div>
